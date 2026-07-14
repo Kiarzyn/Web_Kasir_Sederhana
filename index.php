@@ -138,7 +138,7 @@ while ($trx = $hasil_trx->fetch_assoc()) {
 <body>
 
 <header class="topbar">
-    <h1>🧾 Kasir POS (PHP + MySQL)</h1>
+    <h1>📠 Web Kasir POS Sederhana</h1>
     <nav>
         <button type="button" class="btn btn-nav tab-btn active" data-tab="kasir">Kasir</button>
         <button type="button" class="btn btn-nav tab-btn" data-tab="riwayat">Riwayat Transaksi</button>
