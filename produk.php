@@ -135,7 +135,7 @@ if ($kata_kunci !== '') {
 <body>
 
 <header class="topbar">
-    <h1>🧾 Kasir POS (PHP + MySQL)</h1>
+    <h1>Web Kasir Sederhana</h1>
     <nav>
         <a href="index.php" class="btn btn-nav">Kasir</a>
         <a href="produk.php" class="btn btn-nav active">Manajemen Produk</a>
