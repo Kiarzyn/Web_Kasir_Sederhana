@@ -138,7 +138,7 @@ while ($trx = $hasil_trx->fetch_assoc()) {
 <body>
 
 <header class="topbar">
-    <h1>📠 Web Kasir POS Sederhana</h1>
+    <h1>Web Kasir Sederhana</h1>
     <nav>
         <button type="button" class="btn btn-nav tab-btn active" data-tab="kasir">Kasir</button>
         <button type="button" class="btn btn-nav tab-btn" data-tab="riwayat">Riwayat Transaksi</button>
@@ -255,8 +255,18 @@ while ($trx = $hasil_trx->fetch_assoc()) {
                     <input type="hidden" name="subtotal" id="inputSubtotal" value="<?= (int) $subtotal ?>">
 
                     <div class="form-row">
-                        <label>Diskon (Rp)</label>
-                        <input type="number" name="diskon" id="inputDiskon" min="0" max="<?= (int) $subtotal ?>" value="0">
+                        <label>Diskon</label>
+                        <div class="form-inline">
+                            <div>
+                                <input type="number" name="diskon_nilai" id="inputDiskon" min="0" value="0">
+                            </div>
+                            <div style="max-width:100px;">
+                                <select name="diskon_tipe" id="selectDiskonTipe">
+                                    <option value="persen">%</option>
+                                    <option value="rupiah">Rp</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="summary-row total">
@@ -338,6 +348,7 @@ while ($trx = $hasil_trx->fetch_assoc()) {
 
 const subtotal = <?= (int) $subtotal ?>;
 const inputDiskon = document.getElementById('inputDiskon');
+const selectDiskonTipe = document.getElementById('selectDiskonTipe');
 const inputBayar = document.getElementById('inputBayar');
 const labelTotal = document.getElementById('labelTotal');
 const labelKembali = document.getElementById('labelKembali');
@@ -348,12 +359,18 @@ function formatRupiah(angka) {
 }
 
 function hitungUlang() {
-    let diskon = parseInt(inputDiskon.value) || 0;
-    if (diskon > subtotal) diskon = subtotal;
-    if (diskon < 0) diskon = 0;
+    let diskonNilai = parseFloat(inputDiskon.value) || 0;
+    if (diskonNilai < 0) diskonNilai = 0;
 
-    const total = subtotal - diskon;
-    const bayar = parseInt(inputBayar.value) || 0;
+    // Hitung nominal diskon dalam Rupiah, tergantung tipe yang dipilih (% atau Rp)
+    let diskonRupiah = selectDiskonTipe.value === 'persen'
+        ? subtotal * (diskonNilai / 100)
+        : diskonNilai;
+
+    if (diskonRupiah > subtotal) diskonRupiah = subtotal;
+
+    const total = subtotal - diskonRupiah;
+    const bayar = parseFloat(inputBayar.value) || 0;
     const kembali = bayar - total;
 
     labelTotal.textContent = formatRupiah(total);
@@ -361,6 +378,7 @@ function hitungUlang() {
 }
 
 inputDiskon.addEventListener('input', hitungUlang);
+selectDiskonTipe.addEventListener('change', hitungUlang);
 inputBayar.addEventListener('input', hitungUlang);
 
 // ================== LIVE SEARCH PRODUK (AJAX) ==================
