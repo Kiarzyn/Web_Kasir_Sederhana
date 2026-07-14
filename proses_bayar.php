@@ -22,10 +22,11 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST' || empty($_SESSION['keranjang'])) {
 }
 
 // ================== AMBIL & VALIDASI INPUT ==================
-$diskon_input = isset($_POST['diskon']) ? (int) $_POST['diskon'] : 0;
+$diskon_nilai = isset($_POST['diskon_nilai']) ? (float) $_POST['diskon_nilai'] : 0;
+$diskon_tipe  = isset($_POST['diskon_tipe']) && $_POST['diskon_tipe'] === 'persen' ? 'persen' : 'rupiah';
 $uang_diterima = isset($_POST['uang_diterima']) ? (int) $_POST['uang_diterima'] : 0;
 
-if ($diskon_input < 0) $diskon_input = 0;
+if ($diskon_nilai < 0) $diskon_nilai = 0;
 if ($uang_diterima < 0) $uang_diterima = 0;
 
 // PENTING: subtotal dihitung ULANG dari data keranjang di session (bukan dari input form),
@@ -33,6 +34,16 @@ if ($uang_diterima < 0) $uang_diterima = 0;
 $subtotal = 0;
 foreach ($_SESSION['keranjang'] as $item) {
     $subtotal += $item['harga'] * $item['jumlah'];
+}
+
+// Hitung nominal diskon dalam Rupiah, tergantung tipe yang dipilih (% atau Rp).
+// Perhitungan ini SENGAJA diulang di server (bukan cuma percaya hasil hitung JavaScript),
+// supaya nominal diskon tidak bisa dimanipulasi dari sisi client.
+if ($diskon_tipe === 'persen') {
+    if ($diskon_nilai > 100) $diskon_nilai = 100; // diskon persen maksimal 100%
+    $diskon_input = (int) round($subtotal * ($diskon_nilai / 100));
+} else {
+    $diskon_input = (int) round($diskon_nilai);
 }
 
 if ($diskon_input > $subtotal) {
